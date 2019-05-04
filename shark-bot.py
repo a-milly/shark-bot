@@ -46,7 +46,6 @@ def createMentionString(message):
 def messageCounter(message):
 
     author = createMentionString(message)
-    channel = message.channel
 
     if(author not in leaderboard):
         leaderboard[author] = 1
