@@ -1,6 +1,10 @@
 import logging
 import discord
 import asyncio
+from datetime import datetime
+from threading import Timer
+
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -14,6 +18,18 @@ logger.addHandler(handler)
 client = discord.Client()
 
 leaderboard = {}
+
+x=datetime.today()
+y=x.replace(day=x.day+1, hour=1, minute=0, second=0, microsecond=0)
+delta_t=y-x
+
+secs=delta_t.seconds+1
+
+t = Timer(secs, resetLeaderBoard)
+t.start()
+
+def resetLeaderBoard():
+    leaderboard = {}
 
 @client.event
 async def on_ready():
@@ -29,6 +45,7 @@ def createMentionString(message):
 def messageCounter(message):
 
     author = createMentionString(message)
+    channel = message.channel
 
     if(author not in leaderboard):
         leaderboard[author] = 1
@@ -54,26 +71,12 @@ async def on_message(message):
     msg = messageCounter(message)
     print(msg)
 
-    if message.content.startswith('!test'):
-    	# user = get_user_from_message(message)
+    if message.content.startswith('$topDaily'):
         print(message.author)
         print(msg)
         await message.channel.send(msg)
-    	# await client.send_message(message.channel,"dont't test me baka ")# + user.mention)
-    	# await client.send_message(message.channel, 'dont be so loud ... baka' + ' @' + message.author.name)
 
-    #     counter = 0
-    #     tmp = await client.send_message(message.channel, 'Calculating messages...')
-    #     async for log in client.logs_from(message.channel, limit=100):
-    #         if log.author == message.author:
-    #             counter += 1
 
-    #     await client.edit_message(tmp, 'You have {} messages.'.format(counter))
-
-    # if len(message.content) >= 1:
-    # 	await client.send_message(message.channel, 'dont be so loud ... baka' + ' @' + message.author.name)
-    	# await client.send_message(message.channel, 'dont be so loud ... baka' + ' ' + discord.User(message.author).metnion())
-    
 
     # elif message.content.startswith('!sleep'):
     #     await asyncio.sleep(5)
