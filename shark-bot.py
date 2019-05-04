@@ -30,6 +30,7 @@ t.start()
 
 def resetLeaderBoard():
     leaderboard = {}
+    return leaderboard
 
 @client.event
 async def on_ready():
