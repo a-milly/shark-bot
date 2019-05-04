@@ -75,13 +75,13 @@ async def on_message(message):
     #     await asyncio.sleep(5)
     #     await client.send_message(message.channel, 'Done sleeping')
 
-x=datetime.today()
-y=x.replace(day=x.day+1, hour=1, minute=0, second=0, microsecond=0)
-delta_t=y-x
+# x=datetime.today()
+# y=x.replace(day=x.day+1, hour=1, minute=0, second=0, microsecond=0)
+# delta_t=y-x
 
-secs=delta_t.seconds+1
+# secs=delta_t.seconds+1
 
-t = Timer(secs, resetLeaderBoard)
-t.start()
+# t = Timer(secs, resetLeaderBoard)
+# t.start()
 
 client.run('MzE4MTI5NzAzNzgzMjM1NTg1.DAuDww.uMMplmx_Mr7xp-jIO8ZV1O44NL4')
