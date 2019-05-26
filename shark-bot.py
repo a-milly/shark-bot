@@ -5,9 +5,6 @@ from datetime import datetime
 from threading import Timer
 from dbConnect import dbConnect
 import os
-from boto.s3.connection import S3Connection
-
-s3 = S3Connection(os.environ['DATABASE_URL'], os.environ['DISCORD_TOKEN'])
 
 
 logging.basicConfig(level=logging.INFO)
