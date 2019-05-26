@@ -84,4 +84,4 @@ async def on_message(message):
 # t = Timer(secs, resetLeaderBoard)
 # t.start()
 
-client.run('MzE4MTI5NzAzNzgzMjM1NTg1.DAuDww.uMMplmx_Mr7xp-jIO8ZV1O44NL4')
+client.run()
