@@ -3,7 +3,7 @@ import discord
 import asyncio
 from datetime import datetime
 from threading import Timer
-
+from dbConnect import dbConnect
 
 
 logging.basicConfig(level=logging.INFO)
@@ -14,16 +14,16 @@ handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w'
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
+DATABASE_URL = os.environ['DATABASE_URL']
+CLIENT_TOKEN = os.environ['DISCORD_TOKEN']
 
 client = discord.Client()
 
-leaderboard = {}
-
-
-
-def resetLeaderBoard():
-    leaderboard = {}
-    return leaderboard
+def insertRowIntoDb(row):
+    db = dbConnect(DATABASE_URL)
+    conn = db.initConnection()
+    cur = db.initCursor(conn)
+    db.insertMessageRow(cur, conn, row)
 
 @client.event
 async def on_ready():
@@ -36,52 +36,42 @@ async def on_ready():
 def createMentionString(message):
     return message.author.mention
 
-def messageCounter(message):
-
-    author = createMentionString(message)
-
-    if(author not in leaderboard):
-        leaderboard[author] = 1
-    else:
-        leaderboard[author] += 1
-    
-    sorted_leaderboard = sorted(leaderboard.items(), key=lambda item: item[1], reverse = True)
-
-    msg = messageFormater(sorted_leaderboard)
-
-    return msg
-
-def messageFormater(leaderboard):
-    counter = 1
-    msg_string = ''
-    for author in leaderboard:
-        msg_string += str(counter) +': ' + author[0] + '- ' + str(author[1]) + ' messages' + '\n'
-        counter += 1
-    return msg_string
 
 @client.event
 async def on_message(message):
-    msg = messageCounter(message)
-    print(msg)
 
-    if message.content.startswith('$topDaily'):
+    server_id = message.guild.id
+    server_name = message.guild.name
+    channel = message.channel.id
+    user_id = message.author.id
+    curr_username = message.author.name
+    user_disciminator = message.author.discriminator
+    msg = message.content
+    members = client.get_guild(server_id).members
+    member = [member for member in members if member.id == user_id]  
+    user_join_time = str(member[0].joined_at)
+    message_timestamp = str(message.created_at)
+    msg_id = message.id
+ 
+    
+    row = {
+        'server_id': str(server_id),
+        'server_name': str(server_name),
+        'channel': str(channel),
+        'user_id': str(user_id),
+        'curr_username': str(curr_username),
+        'user_disciminator': str(user_disciminator),
+        'message': str(msg),
+        'user_join_time': str(user_join_time),
+        'message_timestamp': str(message_timestamp),
+        'msg_id': str(msg_id)
+    }
+        
+    insertRowIntoDb(row)
+
+    if message.content.startswith('$mentionMe'):
         print(message.author)
         print(msg)
-        await message.channel.send(msg)
+        await message.channel.send(createMentionString(message))
 
-
-
-    # elif message.content.startswith('!sleep'):
-    #     await asyncio.sleep(5)
-    #     await client.send_message(message.channel, 'Done sleeping')
-
-# x=datetime.today()
-# y=x.replace(day=x.day+1, hour=1, minute=0, second=0, microsecond=0)
-# delta_t=y-x
-
-# secs=delta_t.seconds+1
-
-# t = Timer(secs, resetLeaderBoard)
-# t.start()
-
-client.run('MzE4MTI5NzAzNzgzMjM1NTg1.DAuDww.uMMplmx_Mr7xp-jIO8ZV1O44NL4')
+client.run(CLIENT_TOKEN)
